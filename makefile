@@ -6,10 +6,10 @@ nbody: nbody.o compute.o
 	nvcc $(FLAGS) $^ -o $@ $(LIBS)
 
 nbody.o: nbody.c planets.h config.h vector.h compute.h $(ALWAYS_REBUILD)
-	gcc $(FLAGS) -c $<
+	nvcc $(FLAGS) -c $< -o $@
 
 compute.o: compute.cu config.h vector.h compute.h $(ALWAYS_REBUILD)
-	nvcc $(FLAGS) -c $<
+	nvcc $(FLAGS) -c $< -o $@
 
 clean:
 	rm -f *.o nbody
