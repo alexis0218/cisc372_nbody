@@ -3,6 +3,7 @@
 #include "vector.h"
 #include "config.h"
 #include <cuda_runtime.h>
+#include "compute.h"
 
 vector3 *d_accels;
 double *d_mass;
@@ -11,7 +12,7 @@ __global__ void accelMatrix(vector3 *accels,  vector3 *pos, double *mass, int n)
     int i = blockIdx.y * blockDim.y + threadIdx.y;
     int j = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i>=m || j>=n){
+    if (i>=n || j>=n){
         return;
     }
 
@@ -32,6 +33,10 @@ __global__ void accelMatrix(vector3 *accels,  vector3 *pos, double *mass, int n)
         a[1] = g * dist[1] / distR;
         a[2] = g * dist[2] / distR;
     }
+
+    accels[i*n + j][0] = a[0];
+    accels[i*n + j][1] = a[1];
+    accels[i*n + j][2] = a[2];
 
 }
 
@@ -69,9 +74,9 @@ void initDeviceMemory(){
     cudaMalloc(&d_accels, accelSize);
     cudaMalloc(&d_mass, massSize);
 
-    cudeMemcpy(d_hPos, hPos, vectorSize, cudaMemcpyHostToDevice);
-    cudeMemcpy(d_hVel, hVel, vectorSize, cudaMemcpyHostToDevice
-    cudaMemcpy(d_mass, hMass, massSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_hPos, hPos, vectorSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_hVel, hVel, vectorSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_mass, mass, massSize, cudaMemcpyHostToDevice);
 
 }
 
